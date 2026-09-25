@@ -1,5 +1,9 @@
 # syntax=docker/dockerfile:1
-FROM node:24-alpine AS build
+# Base images are pinned by digest as well as tag. The tag says which line (Node 24,
+# Python 3.11); the digest says which build of it, so one commit always builds from the
+# same bytes, and base-image patches arrive as the monthly Dependabot `docker` PR
+# instead of silently on the next build.
+FROM node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1 AS build
 # corepack installs exactly the pnpm pinned by `packageManager`, so the image, CI and local
 # development all agree on one version.
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
@@ -15,7 +19,7 @@ RUN --mount=type=cache,target=/pnpm-store \
 COPY . .
 RUN pnpm run build
 
-FROM node:24-alpine
+FROM node:24-alpine@sha256:ebfe2f90462722a7a4de65e91990e97fe0d401c70e0e762c5b53302f905ec1c1
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN corepack enable
 WORKDIR /app

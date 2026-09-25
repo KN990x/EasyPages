@@ -75,8 +75,8 @@ updates:
     cooldown:
       default-days: 7
     # A base-image major is a migration (.nvmrc, Dockerfile, engines, docs), not an update.
-    # Security patches within the 24 line still arrive as minor/patch tag moves on
-    # node:24-alpine.
+    # The Dockerfile pins tag + digest, so patches to node:24-alpine arrive here as a new
+    # digest in the monthly group.
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
