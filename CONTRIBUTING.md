@@ -95,7 +95,7 @@ Detailed tree (for navigation and PRs):
 - `scripts/`: `run-tests.mjs`, `syntax-check.mjs`, and other automation.
 - `.github/workflows/ci.yml`: the merge gate — lint, build, both test suites, a Docker build and a cold-start smoke test, on every push and pull request to `main`.
 - `.github/workflows/ghcr-publish.yml`: publishes the root Docker image to GHCR on release publication.
-- `.github/workflows/security-audit.yml`: weekly `pnpm audit`. Deliberately not on push: a vulnerability published today is not a reason to block an unrelated commit.
+- `.github/workflows/security-audit.yml`: monthly `pnpm audit`, plus the "Pending major updates" issue (Dependabot opens minor and patch updates only). Deliberately not on push: a vulnerability published today is not a reason to block an unrelated commit.
 
 ### Architectural boundaries
 
@@ -126,7 +126,7 @@ Changes here need extra care and matching tests:
 
 ## Dependency and dev-server security
 
-- `.github/workflows/security-audit.yml` runs `pnpm audit --prod --audit-level high` weekly, blocking, plus a non-blocking full-tree pass. Production advisories (e.g. `adm-zip`) must be fixed promptly. Dev-only reports (Vite / Vitest / esbuild) concern `pnpm run dev:ui` or the Vitest UI, not the static UI Express serves in production. Do not expose the Vite dev server to untrusted networks.
+- `.github/workflows/security-audit.yml` runs `pnpm audit --prod --audit-level high` monthly, blocking, plus a non-blocking full-tree pass. Production advisories (e.g. `adm-zip`) must be fixed promptly. Dev-only reports (Vite / Vitest / esbuild) concern `pnpm run dev:ui` or the Vitest UI, not the static UI Express serves in production. Do not expose the Vite dev server to untrusted networks.
 
 ## Pull requests
 

@@ -1,12 +1,16 @@
 # Deliberately not on push or pull_request. A vulnerability published today is not a
 # reason to block a commit that has nothing to do with it: run on every push, this sat red
 # on main and decorated every Dependabot PR with a cross nobody could clear.
+#
+# Monthly, not weekly: Dependabot alerts already arrive the day an advisory is published,
+# from the same database. This is the backstop, and a weekly one only repeated the same
+# failure email every Monday until the fix landed.
 name: Security audit
 
 on:
   schedule:
-    # Mondays 05:30 UTC, before the Dependabot run.
-    - cron: "30 5 * * 1"
+    # The 1st of each month, 03:30 UTC: before Dependabot's monthly run (06:00 Madrid).
+    - cron: "30 3 1 * *"
   workflow_dispatch:
 
 permissions:
@@ -18,14 +22,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: ".nvmrc"
           cache: pnpm
@@ -43,3 +47,35 @@ jobs:
       - name: Audit the full tree (informational)
         continue-on-error: true
         run: pnpm audit --audit-level moderate
+
+  # Dependabot ignores majors on purpose; this keeps them visible in one issue that is
+  # edited in place (no notification) instead of a PR per breaking release.
+  majors:
+    name: Pending majors
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: ".nvmrc"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      # Nothing is executed here, so no install scripts either.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --ignore-scripts
+
+      - name: Rewrite the "Pending major updates" issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash .github/scripts/majors-report.sh
