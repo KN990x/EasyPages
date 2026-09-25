@@ -1,15 +1,23 @@
+# Few PRs, none of them surprising:
+#   - Version updates run monthly, one grouped PR per ecosystem, minor and patch only.
+#   - Security updates open as soon as an advisory lands, but grouped into one PR per
+#     ecosystem: `open-pull-requests-limit` does not apply to them, and without a group
+#     each advisory opens its own.
+#   - Majors never arrive as a routine PR. The monthly `Security audit` workflow keeps
+#     them listed in the "Pending major updates" issue, to be planned as migrations.
 version: 2
 updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
-    open-pull-requests-limit: 10
+      interval: "monthly"
+      time: "06:00"
+      timezone: "Europe/Madrid"
+    open-pull-requests-limit: 5
     versioning-strategy: increase-if-necessary
     # Same window as `minimumReleaseAge` in pnpm-workspace.yaml: a version published hours
-    # ago is exactly the one a malicious publish is caught in.
+    # ago is exactly the one a malicious publish is caught in. Not applied to security
+    # updates.
     cooldown:
       default-days: 7
     # Version majors stay a human decision (Express 5, Tailwind 4, Vitest 4, …). This ignore
@@ -35,29 +43,49 @@ updates:
           - "minor"
           - "patch"
 
+  # Actions are pinned by SHA; Dependabot moves the SHA and its version comment together.
+  # Majors stay in the group: CI exercises every action it uses, and actionlint checks the
+  # inputs of the release-only ones (QEMU, login, metadata).
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
+      interval: "monthly"
+      time: "06:00"
+      timezone: "Europe/Madrid"
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
     groups:
+      actions-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
       actions:
+        applies-to: version-updates
         patterns:
           - "*"
 
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "monday"
-      time: "09:00"
-    # Node major stays a deliberate migration (.nvmrc, Dockerfile, engines, docs). Security
-    # patches within the 24 line still arrive as minor/patch tag moves on node:24-alpine.
+      interval: "monthly"
+      time: "06:00"
+      timezone: "Europe/Madrid"
+    open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
+    # A base-image major is a migration (.nvmrc, Dockerfile, engines, docs), not an update.
+    # Security patches within the 24 line still arrive as minor/patch tag moves on
+    # node:24-alpine.
     ignore:
-      - dependency-name: "node"
+      - dependency-name: "*"
         update-types: ["version-update:semver-major"]
     groups:
+      docker-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
       docker:
+        applies-to: version-updates
         patterns:
           - "*"
