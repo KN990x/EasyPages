@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 # Cold-start smoke: one fake CF token, no credentials, HTTP (not HTTPS).
-# Expects an image already tagged as easypages:ci (or SMOKE_IMAGE).
+# Usage: smoke-test.sh [image] [container-name] [platform]
+# Defaults to easypages:ci (or SMOKE_IMAGE / SMOKE_CONTAINER). The release workflow also
+# boots the arm64 image under emulation by passing a platform.
 set -euo pipefail
 
-IMAGE="${SMOKE_IMAGE:-easypages:ci}"
-NAME="${SMOKE_CONTAINER:-easypages-ci}"
+IMAGE="${1:-${SMOKE_IMAGE:-easypages:ci}}"
+NAME="${2:-${SMOKE_CONTAINER:-easypages-ci}}"
+PLATFORM="${3:-}"
 PORT="${SMOKE_PORT:-8002}"
 BASE="http://127.0.0.1:${PORT}"
 
@@ -13,22 +16,31 @@ cleanup() {
 }
 trap cleanup EXIT
 
+platform_args=()
+tries=30
+if [ -n "$PLATFORM" ]; then
+  platform_args=(--platform "$PLATFORM")
+  # Emulated arm64 boots several times slower; still a hard fail if it never answers.
+  tries=90
+fi
+
 # SESSION_COOKIE_SECURE=false: the image sets NODE_ENV=production, which would otherwise
 # mark the session cookie Secure. This smoke talks plain HTTP, and curl then refuses to
 # send that cookie back — every CSRF-protected POST becomes 403.
-docker run -d --name "$NAME" -p "${PORT}:8002" \
+docker run -d --name "$NAME" "${platform_args[@]}" -p "${PORT}:8002" \
   -e CF_API_TOKEN=ci-fake-token \
   -e SESSION_COOKIE_SECURE=false \
   "$IMAGE"
 
-for _ in $(seq 1 30); do
+rm -f /tmp/health.json
+for _ in $(seq 1 "$tries"); do
   if curl -fsS -o /tmp/health.json "${BASE}/api/health"; then
     break
   fi
   sleep 2
 done
 if ! [ -s /tmp/health.json ]; then
-  echo "::error::Container did not respond within 60s"
+  echo "::error::Container did not respond within $((tries * 2))s"
   docker logs "$NAME"
   exit 1
 fi
@@ -120,11 +132,11 @@ mode=$(docker exec "$NAME" stat -c '%a' /data/credentials.json)
 [ "$mode" = "600" ] || { echo "::error::credentials.json is $mode, expected 600"; exit 1; }
 
 # 11. The image's own healthcheck has to agree.
-for _ in $(seq 1 20); do
+for _ in $(seq 1 "$tries"); do
   health=$(docker inspect -f '{{.State.Health.Status}}' "$NAME")
   [ "$health" = "starting" ] || break
   sleep 3
 done
 [ "$health" = "healthy" ] || { echo "::error::container health is $health"; exit 1; }
 
-echo "Cold start, setup wizard, login, session, SPA fallback and healthcheck all OK"
+echo "Cold start, setup wizard, login, session, SPA fallback and healthcheck all OK${PLATFORM:+ for $PLATFORM}"
