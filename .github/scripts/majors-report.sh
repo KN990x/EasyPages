@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Keeps one issue, "Pending major updates", listing every direct dependency whose latest
-# release is a breaking change. Dependabot ignores majors on purpose (they are migrations,
+# release is a new major. Dependabot ignores majors on purpose (they are migrations,
 # not updates), so without this they would go unnoticed until something forces them.
 #
 # The issue is edited in place, never reopened or duplicated: editing an issue body sends
@@ -35,9 +35,9 @@ for dir in $PNPM_DIRS; do
 
   rows="$(echo "$out" | jq -r --arg dir "$dir" --argjson held "$held_json" '
     def parts: split("-")[0] | split(".") | map(tonumber? // 0);
-    # Breaking under caret ranges: another major, or another minor while still on 0.x.
-    def breaking($c; $l): ($c | parts) as $a | ($l | parts) as $b
-      | if $a[0] != $b[0] then true elif $a[0] == 0 then $a[1] != $b[1] else false end;
+    # Exactly what Dependabot treats as a major, so nothing here also arrives as a PR. A
+    # 0.x minor (0.52 -> 0.54) is not one: it comes in the monthly group like any minor.
+    def breaking($c; $l): ($c | parts)[0] != ($l | parts)[0];
     def held($name): any($held[]; . as $g
       | $name | test("^" + ($g | gsub("\\."; "\\.") | gsub("\\*"; ".*")) + "$"));
     def where: [.value.dependentPackages[]?.name] | if length == 0 then $dir else join(", ") end;
@@ -62,8 +62,9 @@ import json, os, re, sys, tomllib
 def norm(name):
     return re.sub(r"[-_.]+", "-", name).lower()
 
-def parts(version):
-    return [int(p) if p.isdigit() else 0 for p in re.split(r"[.+-]", version)[:2]] + [0, 0]
+def major(version):
+    head = re.split(r"[.+-]", version)[0]
+    return int(head) if head.isdigit() else 0
 
 with open(sys.argv[1], "rb") as fh:
     project = tomllib.load(fh)["project"]
@@ -75,8 +76,7 @@ direct = {norm(re.split(r"[\s\[<>=!~;]", spec, maxsplit=1)[0]) for spec in specs
 for pkg in json.loads(os.environ["OUTDATED"]):
     if norm(pkg["name"]) not in direct:
         continue
-    a, b = parts(pkg["version"]), parts(pkg["latest_version"])
-    if a[0] != b[0] or (a[0] == 0 and a[1] != b[1]):
+    if major(pkg["version"]) != major(pkg["latest_version"]):
         print(f"| `{pkg['name']}` | {pkg['version']} | {pkg['latest_version']} | python | {sys.argv[1]} |")
 PY
 )"
@@ -87,7 +87,7 @@ header=$'| Package | Current | Latest | Type | Used by |\n| --- | --- | --- | --
 body="Dependabot does not open major updates here: each one is a migration to plan, not a
 routine bump. This issue is rewritten every month by the \`Security audit\` workflow, so
 there is nothing to close — it stays open as the list of what is waiting."$'\n\n'
-body+="## Breaking releases available"$'\n\n'
+body+="## New majors available"$'\n\n'
 if [ -n "$majors" ]; then body+="$header"$'\n'"$majors"; else body+="Nothing pending."$'\n'; fi
 if [ -n "$HELD" ]; then
   body+=$'\n'"## Held back in dependabot.yml"$'\n\n'"Updated by hand, together: \`$HELD\`."$'\n\n'
