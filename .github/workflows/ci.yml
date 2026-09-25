@@ -20,10 +20,6 @@ concurrency:
   # unvalidated. Superseded PR runs are still fair game.
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-env:
-  ACTIONLINT_VERSION: "1.7.12"
-  CHECK_JSONSCHEMA_VERSION: "0.38.0"
-
 jobs:
   ci:
     name: CI
@@ -36,18 +32,10 @@ jobs:
           persist-credentials: false
 
       # The one file whose breakage is silent: an invalid dependabot.yml disables
-      # Dependabot entirely, with no error anywhere.
+      # Dependabot entirely, with no error anywhere. The check is shared by every KN990x
+      # repository (KN990x/.github), pinned like any other action.
       - name: Validate workflows and Dependabot config
-        run: |
-          set -euo pipefail
-          curl -sSfL \
-            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz" \
-            | tar xz actionlint
-          ./actionlint -color .github/workflows/*.yml
-          rm -f ./actionlint
-          python -m pip install --quiet "check-jsonschema==${CHECK_JSONSCHEMA_VERSION}"
-          check-jsonschema --schemafile https://json.schemastore.org/dependabot-2.0.json \
-            .github/dependabot.yml
+        uses: KN990x/.github/actions/validate-config@716c418539e8af359ae2916399a155b9d00d11c5 # v1.0.0
 
       # No `version:` — pnpm/action-setup reads the one pinned by `packageManager`.
       - name: Set up pnpm
