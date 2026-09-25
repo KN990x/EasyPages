@@ -4,21 +4,29 @@ on:
   release:
     types: [published]
 
-permissions:
-  contents: read
-  packages: write
+# No default permissions at workflow level: each job asks only for what it needs.
+permissions: {}
+
+# Never cancelled mid-flight: a half-pushed multi-arch manifest is worse than a duplicate
+# run, so releases queue instead of superseding each other.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 
 jobs:
   validate-release:
     if: ${{ !github.event.release.prerelease }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout tag
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.release.tag_name }}
+          persist-credentials: false
 
       # No `version:` — pnpm/action-setup reads the one pinned by `packageManager`.
       - name: Set up pnpm
@@ -67,12 +75,16 @@ jobs:
     needs: validate-release
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    permissions:
+      contents: read
+      packages: write # publish the image to GHCR
 
     steps:
       - name: Checkout tag
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.release.tag_name }}
+          persist-credentials: false
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
