@@ -8,14 +8,13 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   # Never on a push. This repo commits straight to main, so that run is the only one a
   # commit ever gets: cancelling it because a second commit arrived would leave the first
   # unvalidated. Superseded PR runs are still fair game.
