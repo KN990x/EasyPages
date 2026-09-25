@@ -29,13 +29,13 @@ updates:
       # Security fixes get their own group with no version filter. Previously a single
       # blanket `ignore` on majors also silenced security majors, which is the one case
       # that must never be held back.
-      security:
+      npm-security:
         applies-to: security-updates
         patterns:
           - "*"
       # Routine updates stay on minor and patch: a major here means a breaking change that
       # deserves a human reading the changelog.
-      dependencies:
+      npm:
         applies-to: version-updates
         patterns:
           - "*"
