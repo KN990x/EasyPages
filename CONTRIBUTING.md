@@ -95,7 +95,7 @@ Detailed tree (for navigation and PRs):
 - `scripts/`: `run-tests.mjs`, `syntax-check.mjs`, and other automation.
 - `.github/workflows/ci.yml`: the merge gate — lint, build, both test suites, a Docker build and a cold-start smoke test, on every push and pull request to `main`.
 - `.github/workflows/ghcr-publish.yml`: publishes the root Docker image to GHCR on release publication, through the shared pipeline in [KN990x/.github](https://github.com/KN990x/.github); also a monthly dry run without pushing.
-- `.github/workflows/automerge.yml`: merges routine Dependabot PRs (no majors, dependency files only) once CI passes, then re-runs CI on `main`; rules in [KN990x/.github](https://github.com/KN990x/.github). Label a PR `no-automerge` to keep it for a human.
+- `.github/workflows/automerge.yml`: merges a routine Dependabot PR (no majors, dependency files only) once CI passes and it has an approving review on its current head, then re-runs CI on `main`; rules in [KN990x/.github](https://github.com/KN990x/.github). Label a PR `no-automerge` to keep it for a human.
 - `.github/workflows/security-audit.yml`: monthly `pnpm audit`, plus the "Pending major updates" issue (Dependabot opens minor and patch updates only). Deliberately not on push: a vulnerability published today is not a reason to block an unrelated commit.
 
 ### Architectural boundaries
