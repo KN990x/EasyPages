@@ -18,7 +18,8 @@
     "test": "pnpm run test:server && pnpm run test:web",
     "test:server": "node scripts/run-tests.mjs",
     "test:web": "vitest run",
-    "check": "node scripts/syntax-check.mjs"
+    "check:syntax": "node scripts/syntax-check.mjs",
+    "check": "pnpm run check:syntax && pnpm run lint && pnpm run build && pnpm test"
   },
   "dependencies": {
     "adm-zip": "^0.6.0",

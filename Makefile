@@ -38,6 +38,7 @@ lint:
 test: build
 	$(PNPM) test
 
+# The full local gate: syntax, lint, build, then both suites (what CI runs before the image).
 check:
 	$(PNPM) run check
 

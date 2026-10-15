@@ -44,7 +44,8 @@ Deleting `./data` (or `make clean-data`) gives you the setup wizard from scratch
 | `pnpm test` | Both suites: `test:server` then `test:web` |
 | `pnpm run test:server` | Backend only (`node:test`, `tests/**/*.test.js`) |
 | `pnpm run test:web` | Frontend only (Vitest + Testing Library, `src/web/**/*.test.jsx`) |
-| `pnpm run check` | Syntax check on `src/`, `tests/`, and config entry files |
+| `pnpm run check:syntax` | Syntax check on `src/`, `tests/`, and config entry files |
+| `pnpm run check` | **The full local gate**: syntax, lint, build, then both suites |
 
 A [`Makefile`](./Makefile) wraps the same targets (`make setup`, `make dev`, `make lint`, `make test`, `make clean-data`).
 
@@ -57,7 +58,7 @@ Run these in order after your changes:
 3. `pnpm test`
 4. If you changed the [`Dockerfile`](./Dockerfile), the dependency tree, or the Node/Alpine base image, run `docker build -t easypages-local .` locally to confirm the image still builds (requires Docker).
 
-`make lint && make test` does 1–3 in the right order.
+`pnpm run check` (or `make check`) does 1–3 in the right order, after a syntax check.
 
 Fix any failures before requesting review.
 
