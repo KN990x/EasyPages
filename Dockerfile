@@ -11,7 +11,7 @@ RUN corepack enable
 WORKDIR /app
 
 # Manifests first so the dependency layer survives source-only changes.
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN --mount=type=cache,target=/pnpm-store \
     pnpm config set store-dir /pnpm-store && \
     pnpm install --frozen-lockfile
@@ -24,7 +24,7 @@ ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN corepack enable
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 # --ignore-scripts is redundant while `allowBuilds` lists only esbuild (a build-time
 # dependency), but it states the intent: since scrypt replaced bcrypt the production tree
 # is pure JavaScript, so nothing here has to compile and nothing gets to run on install.
