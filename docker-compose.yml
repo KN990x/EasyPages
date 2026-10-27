@@ -1,7 +1,7 @@
 services:
   easypages:
     container_name: easypages
-    image: ghcr.io/kn990x/easypages:2.1.4
+    image: ghcr.io/kn990x/easypages:2.1.5
     restart: unless-stopped
     ports:
       - "8002:8002"
