@@ -14,8 +14,8 @@ You can open issues for bugs or ideas, and pull requests for fixes or features.
 
 ## Local setup
 
-1. Use **Node.js 24+** (`engines` in [`package.json`](./package.json), [`.nvmrc`](./.nvmrc) for `nvm use`).
-2. Enable corepack and install: `corepack enable && pnpm install --frozen-lockfile`.
+1. Use **Node.js 26+** (`engines` in [`package.json`](./package.json), [`.nvmrc`](./.nvmrc) for `nvm use`).
+2. Enable corepack and install: `corepack enable && pnpm install --frozen-lockfile` (Node 25+ no longer ships Corepack: `npm install -g corepack` first).
 3. Copy `.env.example` to `.env` and fill in `CF_API_TOKEN` (see README for token scope). `CF_ACCOUNT_ID` is optional — it is inferred from the token on the first Cloudflare call, and only has to be set when the token can reach more than one account. There is nothing to configure for the operator account: the first run shows the setup wizard in the browser.
 4. For day-to-day work you usually run **two terminals**:
    - Backend: `pnpm run dev` (watches `src/index.js`).

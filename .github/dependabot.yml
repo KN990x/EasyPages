@@ -79,7 +79,7 @@ updates:
     cooldown:
       default-days: 7
     # A base-image major is a migration (.nvmrc, Dockerfile, engines, docs), not an update.
-    # The Dockerfile pins tag + digest, so patches to node:24-alpine arrive here as a new
+    # The Dockerfile pins tag + digest, so patches to node:26-alpine arrive here as a new
     # digest in the monthly group.
     ignore:
       - dependency-name: "*"

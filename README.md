@@ -115,12 +115,14 @@ Token creation page: [Cloudflare Dashboard > My Profile > API Tokens](https://da
 
 ### Local development
 
-Use **Node.js 24+** (same major as the Docker image and release CI). With [nvm](https://github.com/nvm-sh/nvm), run `nvm use` in the repo root (see [`.nvmrc`](.nvmrc)).
+Use **Node.js 26+** (same major as the Docker image and release CI). With [nvm](https://github.com/nvm-sh/nvm), run `nvm use` in the repo root (see [`.nvmrc`](.nvmrc)).
 
 This project uses **pnpm**, pinned in `packageManager`. Corepack picks up the right version
-on its own, so you get the same pnpm as CI and the Docker image:
+on its own, so you get the same pnpm as CI and the Docker image. Node 25+ no longer ships Corepack, so
+install it first:
 
 ```bash
+npm install -g corepack
 corepack enable
 pnpm install --frozen-lockfile
 ```
@@ -244,12 +246,14 @@ Página de creación: [Cloudflare Dashboard > My Profile > API Tokens](https://d
 
 ### Desarrollo local
 
-Usa **Node.js 24+** (la misma major que la imagen Docker y el CI de releases). Con [nvm](https://github.com/nvm-sh/nvm), ejecuta `nvm use` en la raíz del repo (ver [`.nvmrc`](.nvmrc)).
+Usa **Node.js 26+** (la misma major que la imagen Docker y el CI de releases). Con [nvm](https://github.com/nvm-sh/nvm), ejecuta `nvm use` en la raíz del repo (ver [`.nvmrc`](.nvmrc)).
 
 Este proyecto usa **pnpm**, fijado en `packageManager`. Corepack resuelve la versión correcta
-por su cuenta, así que usas el mismo pnpm que el CI y que la imagen Docker:
+por su cuenta, así que usas el mismo pnpm que el CI y que la imagen Docker. Desde Node 25 ya no viene Corepack,
+así que instálalo antes:
 
 ```bash
+npm install -g corepack
 corepack enable
 pnpm install --frozen-lockfile
 ```
