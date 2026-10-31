@@ -94,7 +94,7 @@ More variables: [`.env.example`](.env.example). Compose ships a pinned GHCR imag
 ## Requirements
 
 - **Docker path:** Docker and Docker Compose.
-- **From source:** Node.js **24** or newer — see [For developers](#for-developers).
+- **From source:** Node.js **26** or newer — see [For developers](#for-developers).
 
 You also need a Cloudflare account and an API token with Pages access (below).
 
@@ -225,7 +225,7 @@ Más variables: [`.env.example`](.env.example). El Compose incluye una imagen fi
 ## Requisitos
 
 - **Con Docker:** Docker y Docker Compose.
-- **Desde código:** Node.js **24** o superior — ver [Para desarrolladores](#para-desarrolladores).
+- **Desde código:** Node.js **26** o superior — ver [Para desarrolladores](#para-desarrolladores).
 
 También necesitas una cuenta de Cloudflare y un token de API con acceso a Pages (apartado siguiente).
 
