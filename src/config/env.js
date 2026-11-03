@@ -2,9 +2,11 @@ import dotenv from 'dotenv';
 import { defaultDataDir, repoEnvPath } from './paths.js';
 import { trimEnv } from './trimEnv.js';
 
-const dotenvResult = dotenv.config({ path: repoEnvPath });
+// dotenv 17+ logs an "injected env" line on every config() call unless told not to; with
+// the fallback below a host without a repo .env would print it twice on each start.
+const dotenvResult = dotenv.config({ path: repoEnvPath, quiet: true });
 if (dotenvResult.error) {
-  dotenv.config();
+  dotenv.config({ quiet: true });
 }
 
 export const PORT = trimEnv(process.env.PORT) || 8002;
