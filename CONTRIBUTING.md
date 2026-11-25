@@ -28,7 +28,7 @@ You can open issues for bugs or ideas, and pull requests for fixes or features.
 Two settings in [`pnpm-workspace.yaml`](./pnpm-workspace.yaml) are deliberate:
 
 - `allowBuilds` — pnpm blocks dependency install scripts by default, the classic supply-chain vector. They are allowed one at a time; only `esbuild` needs one, and only at build time. Since scrypt replaced bcrypt there is no native code in the production tree at all.
-- `minimumReleaseAge: 10080` — a version must be 7 days old before a fresh resolution will pick it, which is the window in which malicious publishes get caught. pnpm 11 enforces it on an existing lockfile too, `--frozen-lockfile` included: a lockfile entry younger than 7 days fails the install in CI and in the Docker build, so a Dependabot security PR for a fresh release stays red until that version is 7 days old. Aligned with `cooldown: default-days: 7` in [`dependabot.yml`](./.github/dependabot.yml).
+- `minimumReleaseAge: 10080` — a version must be 7 days old before a fresh resolution will pick it, which is the window in which malicious publishes get caught. pnpm 11 enforces it on an existing lockfile too, `--frozen-lockfile` included: a lockfile entry younger than 7 days fails the install in CI and in the Docker build, so a security fix that only exists in a fresh release waits until that version is 7 days old.
 
 Deleting `./data` (or `make clean-data`) gives you the setup wizard from scratch.
 
@@ -96,8 +96,7 @@ Detailed tree (for navigation and PRs):
 - `scripts/`: `run-tests.mjs`, `syntax-check.mjs`, and other automation.
 - `.github/workflows/ci.yml`: the merge gate — lint, build, both test suites, a Docker build and a cold-start smoke test, on every push and pull request to `main`.
 - `.github/workflows/ghcr-publish.yml`: publishes the root Docker image to GHCR on release publication, through the shared pipeline in [KN990x/.github](https://github.com/KN990x/.github); also a monthly dry run without pushing.
-- `.github/workflows/automerge.yml`: merges a routine Dependabot PR (no majors, dependency files only) once CI passes and it has an approving review on its current head, then re-runs CI on `main`; rules in [KN990x/.github](https://github.com/KN990x/.github). Label a PR `no-automerge` to keep it for a human.
-- `.github/workflows/security-audit.yml`: monthly `pnpm audit`, plus the "Pending major updates" issue (Dependabot opens minor and patch updates only). Deliberately not on push: a vulnerability published today is not a reason to block an unrelated commit.
+- Dependency updates and `pnpm audit` are run by hand, with the full check, not in Actions; Dependabot security alerts stay on.
 
 ### Architectural boundaries
 
@@ -128,7 +127,7 @@ Changes here need extra care and matching tests:
 
 ## Dependency and dev-server security
 
-- `.github/workflows/security-audit.yml` runs `pnpm audit --prod --audit-level high` monthly, blocking, plus a non-blocking full-tree pass. Production advisories (e.g. `adm-zip`) must be fixed promptly. Dev-only reports (Vite / Vitest / esbuild) concern `pnpm run dev:ui` or the Vitest UI, not the static UI Express serves in production. Do not expose the Vite dev server to untrusted networks.
+- `pnpm audit --prod --audit-level high` must stay clean, and the full tree is reviewed too (`pnpm audit`); both run with every dependency update, alongside the Dependabot security alerts. Production advisories (e.g. `adm-zip`) must be fixed promptly. Dev-only reports (Vite / Vitest / esbuild) concern `pnpm run dev:ui` or the Vitest UI, not the static UI Express serves in production. Do not expose the Vite dev server to untrusted networks.
 
 ## Pull requests
 

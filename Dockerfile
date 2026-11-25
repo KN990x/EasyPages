@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # Base images are pinned by digest as well as tag. The tag says which line (Node 26,
 # Python 3.11); the digest says which build of it, so one commit always builds from the
-# same bytes, and base-image patches arrive as the monthly Dependabot `docker` PR
+# same bytes, and base-image patches arrive as a deliberate digest bump in a commit
 # instead of silently on the next build.
 FROM node:26-alpine@sha256:40cd011b55415bc894e45b02fdd5a5dfde056921b7d23a64c74f80497af48797 AS build
 # corepack installs exactly the pnpm pinned by `packageManager`, so the image, CI and local

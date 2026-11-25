@@ -10,12 +10,11 @@ allowBuilds:
 
 # Minimum age a version must have before a fresh resolution will consider it: 7 days
 # (10080 minutes). Avoids installing a package published hours ago, which is exactly the
-# window in which malicious publishes get caught. Deliberately aligned with
-# `cooldown: default-days: 7` in .github/dependabot.yml.
+# window in which malicious publishes get caught.
 # pnpm 11 also checks an existing lockfile against it, --frozen-lockfile included: an entry
 # younger than 7 days fails the install (ERR_PNPM_MINIMUM_RELEASE_AGE_VIOLATION) in CI and in
-# the Docker build. A Dependabot security PR for a fresh release therefore stays red until the
-# version is 7 days old; security updates do not honour the Dependabot cooldown.
+# the Docker build. A security fix that only exists in a fresh release therefore waits until
+# that version is 7 days old.
 minimumReleaseAge: 10080
 
 # Moved here from .npmrc: pnpm 11 only reads auth settings from .npmrc.

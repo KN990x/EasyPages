@@ -1,95 +1,10 @@
-# Few PRs, none of them surprising:
-#   - Version updates run monthly, one grouped PR per ecosystem, minor and patch only.
-#   - Security updates open as soon as an advisory lands, but grouped into one PR per
-#     ecosystem: `open-pull-requests-limit` does not apply to them, and without a group
-#     each advisory opens its own.
-#   - Majors never arrive as a routine PR. The monthly `Security audit` workflow keeps
-#     them listed in the "Pending major updates" issue, to be planned as migrations.
+# Version updates are off: dependencies are updated by hand, with this repository's full
+# check, and Dependabot security alerts stay on. This file stays only because the shared
+# config check pinned in ci.yml (KN990x/.github v1.x) needs one; it goes when that pin moves.
 version: 2
 updates:
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-      time: "06:00"
-      timezone: "Europe/Madrid"
-    open-pull-requests-limit: 5
-    versioning-strategy: increase-if-necessary
-    # Same window as `minimumReleaseAge` in pnpm-workspace.yaml: a version published hours
-    # ago is exactly the one a malicious publish is caught in. Not applied to security
-    # updates.
-    cooldown:
-      default-days: 7
-    # Version majors stay a human decision (Express 5, Tailwind 4, Vitest 4, …). This ignore
-    # applies only to version updates — Dependabot security updates still open even for majors.
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
-    groups:
-      # Security fixes get their own group with no version filter. Previously a single
-      # blanket `ignore` on majors also silenced security majors, which is the one case
-      # that must never be held back.
-      npm-security:
-        applies-to: security-updates
-        patterns:
-          - "*"
-      # Routine updates stay on minor and patch: a major here means a breaking change that
-      # deserves a human reading the changelog.
-      npm:
-        applies-to: version-updates
-        patterns:
-          - "*"
-        update-types:
-          - "minor"
-          - "patch"
-
-  # Actions are pinned by SHA; Dependabot moves the SHA and its version comment together.
-  # Majors stay in the group: CI exercises every action it uses, and actionlint checks the
-  # inputs of the release-only ones (QEMU, login, metadata).
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "monthly"
-      time: "06:00"
-      timezone: "Europe/Madrid"
-    open-pull-requests-limit: 5
-    # Our own shared workflows (KN990x/.github) skip the cooldown: it guards against a
-    # malicious third-party publish, not against a release we tagged ourselves.
-    cooldown:
-      default-days: 7
-      exclude:
-        - "KN990x/*"
-    groups:
-      actions-security:
-        applies-to: security-updates
-        patterns:
-          - "*"
-      actions:
-        applies-to: version-updates
-        patterns:
-          - "*"
-
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "monthly"
-      time: "06:00"
-      timezone: "Europe/Madrid"
-    open-pull-requests-limit: 5
-    cooldown:
-      default-days: 7
-    # A base-image major is a migration (.nvmrc, Dockerfile, engines, docs), not an update.
-    # The Dockerfile pins tag + digest, so patches to node:26-alpine arrive here as a new
-    # digest in the monthly group.
-    ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
-    groups:
-      docker-security:
-        applies-to: security-updates
-        patterns:
-          - "*"
-      docker:
-        applies-to: version-updates
-        patterns:
-          - "*"
+    open-pull-requests-limit: 0
