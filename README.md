@@ -113,23 +113,32 @@ Token creation page: [Cloudflare Dashboard > My Profile > API Tokens](https://da
 
 ## For developers
 
-### Local development
-
-Use **Node.js 26+** (same major as the Docker image and release CI). With [nvm](https://github.com/nvm-sh/nvm), run `nvm use` in the repo root (see [`.nvmrc`](.nvmrc)).
-
-This project uses **pnpm**, pinned in `packageManager`. Corepack picks up the right version
-on its own, so you get the same pnpm as CI and the Docker image. Node 25+ no longer ships Corepack, so
-install it first:
+### Set up the project on a new machine
 
 ```bash
-npm install -g corepack
-corepack enable
-pnpm install --frozen-lockfile
+git clone https://github.com/KN990x/EasyPages.git && cd EasyPages
+mise install          # Node from .nvmrc (or: nvm install && nvm use)
+npm install -g corepack && corepack enable
+pnpm run setup
 ```
 
-Create `.env` from [`.env.example`](.env.example) with your Cloudflare token — that is the
-only required variable. There is nothing to configure for the operator account: the first time you open the app it shows the
-setup wizard. Local data (credential and session secret) goes to `./data` by default.
+Use **Node.js 26+** (same major as the Docker image and release CI, pinned in [`.nvmrc`](.nvmrc)).
+This project uses **pnpm**, pinned in `packageManager`. Corepack picks up the right version
+on its own, so you get the same pnpm as CI and the Docker image. Node 25+ no longer ships
+Corepack, hence the `npm install -g corepack` line.
+
+`pnpm run setup` (not `pnpm setup`, which is a pnpm built-in) checks Node against `.nvmrc` and
+pnpm against `packageManager`, installs the dependencies from the frozen lockfile and creates
+`.env` from [`.env.example`](.env.example) if it does not exist yet. It never overwrites a local
+file and never prints a value: it lists by name the keys you still have to fill in. On a fresh
+clone that is only `CF_API_TOKEN`, your Cloudflare token (see [the permissions](#cloudflare-token-permissions)).
+Edit `.env`, run `pnpm run setup` again until it says it is ready (it is safe to repeat), then
+start the dev servers below. `make setup` does the same.
+
+There is nothing to configure for the operator account: the first time you open the app it
+shows the setup wizard. Local data (credential and session secret) goes to `./data` by default.
+
+### Local development
 
 For a production-like local run:
 
@@ -244,23 +253,32 @@ Página de creación: [Cloudflare Dashboard > My Profile > API Tokens](https://d
 
 ## Para desarrolladores
 
-### Desarrollo local
-
-Usa **Node.js 26+** (la misma major que la imagen Docker y el CI de releases). Con [nvm](https://github.com/nvm-sh/nvm), ejecuta `nvm use` en la raíz del repo (ver [`.nvmrc`](.nvmrc)).
-
-Este proyecto usa **pnpm**, fijado en `packageManager`. Corepack resuelve la versión correcta
-por su cuenta, así que usas el mismo pnpm que el CI y que la imagen Docker. Desde Node 25 ya no viene Corepack,
-así que instálalo antes:
+### Montar el proyecto en otra máquina
 
 ```bash
-npm install -g corepack
-corepack enable
-pnpm install --frozen-lockfile
+git clone https://github.com/KN990x/EasyPages.git && cd EasyPages
+mise install          # Node de .nvmrc (o: nvm install && nvm use)
+npm install -g corepack && corepack enable
+pnpm run setup
 ```
 
-Crea `.env` desde [`.env.example`](.env.example) con tu token de Cloudflare, que es la única
-variable obligatoria. La cuenta de operador no se configura en ningún sitio: la primera vez que abras la aplicación verás el
-asistente. Los datos locales (credencial y secreto de sesión) van a `./data` por defecto.
+Usa **Node.js 26+** (la misma major que la imagen Docker y el CI de releases, fijada en
+[`.nvmrc`](.nvmrc)). Este proyecto usa **pnpm**, fijado en `packageManager`. Corepack resuelve la
+versión correcta por su cuenta, así que usas el mismo pnpm que el CI y que la imagen Docker. Desde
+Node 25 ya no viene Corepack: de ahí la línea `npm install -g corepack`.
+
+`pnpm run setup` (no `pnpm setup`, que es un comando propio de pnpm) comprueba Node frente a
+`.nvmrc` y pnpm frente a `packageManager`, instala las dependencias con el lockfile congelado y
+crea `.env` desde [`.env.example`](.env.example) si todavía no existe. Nunca sobrescribe un fichero
+local ni imprime un valor: lista por nombre las claves que te falta rellenar. En un clon nuevo es
+solo `CF_API_TOKEN`, tu token de Cloudflare (ver [los permisos](#permisos-del-token-de-cloudflare)).
+Edita `.env`, vuelve a lanzar `pnpm run setup` hasta que diga que está listo (se puede repetir sin
+riesgo) y arranca los servidores de desarrollo de abajo. `make setup` hace lo mismo.
+
+La cuenta de operador no se configura en ningún sitio: la primera vez que abras la aplicación verás
+el asistente. Los datos locales (credencial y secreto de sesión) van a `./data` por defecto.
+
+### Desarrollo local
 
 Para una ejecución local parecida a producción:
 

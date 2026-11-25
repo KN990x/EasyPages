@@ -15,8 +15,8 @@ You can open issues for bugs or ideas, and pull requests for fixes or features.
 ## Local setup
 
 1. Use **Node.js 26+** (`engines` in [`package.json`](./package.json), [`.nvmrc`](./.nvmrc) for `nvm use`).
-2. Enable corepack and install: `corepack enable && pnpm install --frozen-lockfile` (Node 25+ no longer ships Corepack: `npm install -g corepack` first).
-3. Copy `.env.example` to `.env` and fill in `CF_API_TOKEN` (see README for token scope). `CF_ACCOUNT_ID` is optional — it is inferred from the token on the first Cloudflare call, and only has to be set when the token can reach more than one account. There is nothing to configure for the operator account: the first run shows the setup wizard in the browser.
+2. Enable corepack and run the setup: `corepack enable && pnpm run setup` (Node 25+ no longer ships Corepack: `npm install -g corepack` first). It checks Node and pnpm, installs from the frozen lockfile, creates `.env` from `.env.example` if it is missing and lists by name the keys still to fill in. It never overwrites a local file, so it is safe to repeat.
+3. Fill in `CF_API_TOKEN` in `.env` (see README for token scope). `CF_ACCOUNT_ID` is optional — it is inferred from the token on the first Cloudflare call, and only has to be set when the token can reach more than one account. There is nothing to configure for the operator account: the first run shows the setup wizard in the browser.
 4. For day-to-day work you usually run **two terminals**:
    - Backend: `pnpm run dev` (watches `src/index.js`).
    - Frontend: `pnpm run dev:ui` (Vite against the API).
@@ -36,6 +36,7 @@ Deleting `./data` (or `make clean-data`) gives you the setup wizard from scratch
 
 | Command | When to use |
 |--------|-------------|
+| `pnpm run setup` | Fresh clone to a working dev setup (safe to repeat) |
 | `pnpm run dev` | Backend with watch |
 | `pnpm run dev:ui` | Vite dev server for the React app |
 | `pnpm run build` | Production UI build into `dist/` |

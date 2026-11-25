@@ -7,10 +7,10 @@ PNPM ?= corepack pnpm
 
 .PHONY: setup dev dev-ui build up lint test check image clean-data
 
+# Fresh clone to a working dev setup: toolchain check, frozen install, .env from .env.example
+# (never overwritten) and the keys still to fill in. Safe to repeat. See scripts/setup.mjs.
 setup:
-	$(PNPM) install --frozen-lockfile
-	@echo "Done. Copy .env.example to .env and fill in CF_API_TOKEN."
-	@echo "The operator account is created in the browser the first time you open EasyPages."
+	$(PNPM) run setup
 
 # API on 8002. The data directory defaults to ./data, so deleting it gives you the setup
 # wizard from scratch (see clean-data).

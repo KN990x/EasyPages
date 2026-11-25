@@ -9,6 +9,7 @@
     "pnpm": ">=11.14.0"
   },
   "scripts": {
+    "setup": "node scripts/setup.mjs",
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
     "dev:ui": "vite",
